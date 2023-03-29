@@ -7,7 +7,7 @@ This repository provides deployment code for installing some tools and platforms
 ```
 git clone https://github.com/VelocityLight/k8s-toolbox.git
 cd k8s-toolbox
-kubectl apply -f <folder>/*
+kubectl apply -f <folder>/
 ```
 
 ## Tools
