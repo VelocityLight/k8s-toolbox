@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-config
+  namespace: shared-infra
+data:
+  MARIADB_ROOT_PASSWORD: cikx103xorkwdj0K_oiOJOI12jCO
+  MARIADB_USER: matomo
+  MARIADB_PASSWORD: matomo
+  MARIADB_DATABASE: matomo
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pvc
+  namespace: shared-infra
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500M
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+  namespace: shared-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:10.9.1-rc-jammy
+          ports:
+            - name: mariadb
+              containerPort: 3306
+          envFrom:
+            - configMapRef:
+                name: mariadb-config
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mariadb-volume
+      volumes:
+        - name: mariadb-volume
+          persistentVolumeClaim:
+            claimName: mariadb-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  namespace: shared-infra
+spec:
+  selector:
+    app: mariadb
+  ports:
+    - name: mariadb
+      port: 3306
+      targetPort: mariadb
+  type: ClusterIP
