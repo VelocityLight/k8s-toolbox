@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: mariadb
-          image: mariadb:latest
+          image: mariadb:10.9.1-rc-jammy
           ports:
             - name: mariadb
               containerPort: 3306
