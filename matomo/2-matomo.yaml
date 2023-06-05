@@ -10,10 +10,15 @@ data:
   MATOMO_DATABASE_PASSWORD: matomo
   MATOMO_DATABASE_DBNAME: matomo
   MATOMO_DATABASE_TABLES_PREFIX: matomo_
-  MATOMO_GENERAL_ENABLE_TRUSTED_HOST_CHECK: "0"   # Not Working, Don't know why
-  MATOMO_GENERAL_FORCE_SSL: "1"
-  MATOMO_PROXY_CLIENT_HEADER: "X-Forwarded-Proto: https"
-  MATOMO_HTTPS: "1"
+  # MATOMO_GENERAL_ENABLE_TRUSTED_HOST_CHECK: "0"   # Not Working, Don't know why
+  # MATOMO_GENERAL_FORCE_SSL: "1"
+  # MATOMO_PROXY_CLIENT_HEADER: "X-Forwarded-Proto: https"
+  # MATOMO_HTTPS: "1"
+  # global.ini.php: |
+  #   [General]
+  #   enable_trusted_host_check=0
+  #   force_ssl=1
+  #   trusted_hosts[] = "matomo.pingcap.net"
 
 ---
 
@@ -46,6 +51,13 @@ spec:
       labels:
         app: matomo
     spec:
+      initContainers:
+        - name: pod-init-config
+          image: busybox
+          command: ["sh", "-c", "chown -R www-data:www-data /var/www/html && sed -i 's/force_ssl = .*/force_ssl = 1/' /var/www/html/config/global.ini.php"]
+          volumeMounts:
+          - name: web-dir
+            mountPath: /var/www/html
       containers:
         - name: matomo
           image: matomo:latest
