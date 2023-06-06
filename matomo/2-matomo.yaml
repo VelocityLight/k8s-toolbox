@@ -51,13 +51,6 @@ spec:
       labels:
         app: matomo
     spec:
-      initContainers:
-        - name: pod-init-config
-          image: busybox
-          command: ["sh", "-c", "chown -R www-data:www-data /var/www/html && sed -i 's/force_ssl = .*/force_ssl = 1/' /var/www/html/config/global.ini.php"]
-          volumeMounts:
-          - name: web-dir
-            mountPath: /var/www/html
       containers:
         - name: matomo
           image: matomo:latest
